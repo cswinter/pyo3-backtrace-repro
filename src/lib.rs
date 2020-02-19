@@ -1,9 +1,22 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use std::panic::catch_unwind;
+use std::panic;
+
+
+#[no_mangle]
+pub extern fn raw_oh_noes() {
+    oh_noes();
+}
 
 #[pyfunction]
-fn oh_noes() -> PyResult<String> {
-    foo()
+pub fn oh_noes() -> PyResult<String> {
+    match catch_unwind(|| {
+        foo()
+    }) {
+        Ok(e) => e,
+        Err(e) => Ok(format!("Error: {:?}", e)),
+    }
 }
 
 fn foo() -> PyResult<String> {
